@@ -70,13 +70,13 @@ int main(int argc, const char * argv[]) {
        float3{0.f, 0.f, 0.f},
        float3{10.f, 10.f, 10.f}
    });
-    scene.addModelInstance(Model{
-       metalDevice,
-       commandQueue,"/Users/menji/Downloads/house/flat-archiviz.gltf",
-       float3{-2.f, 6.f, 0.f},
-       float3{0.f, 0.f, 0.f},
-       float3{1.f, 1.f, 1.f}
-   });
+//    scene.addModelInstance(Model{
+//       metalDevice,
+//       commandQueue,"/Users/menji/Downloads/house/flat-archiviz.gltf",
+//       float3{-2.f, 6.f, 0.f},
+//       float3{0.f, 0.f, 0.f},
+//       float3{1.f, 1.f, 1.f}
+//   });
     scene.addModelInstance(Model{
         metalDevice,
         commandQueue,
@@ -146,6 +146,19 @@ int main(int argc, const char * argv[]) {
         simd::float4x4 projectionMatrix;
         
     };
+    
+    struct CameraPostParams {
+        float manualExposure = 0.1f;
+        float aperture;
+        float shutterSpeed;
+        float iso;
+        float evComp;
+        int isPhysicalMode;
+        float pad[2]; // Metal 端对齐
+    };
+    
+    CameraPostParams physicalParams;
+    
     // Skybox vertices (8 points, float3 position)
     simd::float3 skyboxVertices[] = {
         {-1.0f, -1.0f, -1.0f},
@@ -514,6 +527,7 @@ int main(int argc, const char * argv[]) {
         
         { // update State
             drawable = metalLayer->nextDrawable();
+            if (!drawable) return;
             renderTarget = drawable->texture();
 //            forwardPassDescriptor->colorAttachments()->object(0)->setTexture(rawColorTexture);
 //            bloomThresholdPassDescriptor->colorAttachments()->object(0)->setTexture(bloomThresholdMap);
@@ -568,6 +582,69 @@ int main(int argc, const char * argv[]) {
             renderCommandEncoder->endEncoding();
         }
         
+        std::vector<LightData> framelights;
+        { // light
+            for (const auto &instance : scene.getInstances()) {
+                const Model &model = scene.getModel(instance.modelIndex);
+                for(auto light : model.getLights()) {
+                    if (light.position.w < 0.5f) {
+                        continue;
+                    }
+                    
+                    // 光源也要乘以 ModelInstance 的矩阵
+                    simd::float4 worldPos = instance.modelMatrix * simd::float4{light.position.x, light.position.y, light.position.z, 1.0f};
+                    
+                    light.position.x = worldPos.x;
+                    light.position.y = worldPos.y;
+                    light.position.z = worldPos.z;
+                    
+                    simd::float4 worldDir = instance.modelMatrix * simd::float4{light.direction.x, light.direction.y, light.direction.z ,0.0f};
+                    
+                    light.direction.x = worldDir.x;
+                    light.direction.y = worldDir.y;
+                    light.direction.z = worldDir.z;
+                    
+                    framelights.push_back(light);
+                }
+            }
+        }
+        
+        float t = std::min(std::max((physicalParams.manualExposure - 0.1f) / (1.0f - 0.1f), 0.0f), 1.0f);
+        
+        simd::float3 duskColor = {0.8f, 0.608f, 0.300f}; // 0.1 时的暖黄光
+        simd::float3 dayColor = {1.0f, 0.98f, 0.95f};    // 1.0 时的冷白光
+
+        // 线性插值 (Lerp)： color = dusk + (day - dusk) * t
+        simd::float3 dynamicLightColor = duskColor + (dayColor - duskColor) * t;
+        
+        LightData hardcodedSun;
+        hardcodedSun.position =
+            simd::float4{0.0f, 0.0f, 0.0f, 0.0f}; // w=0.0 表示平行光
+        // 注意这里直接用在函数开头定义的 globalLightDir
+        hardcodedSun.direction =
+            simd::float4{globalLightDir.x, globalLightDir.y, globalLightDir.z, 0.0f};
+        // 颜色和强度 (3.0f 强度根据画面的亮暗自行调整)
+        hardcodedSun.color = simd::float4{dynamicLightColor.x, dynamicLightColor.y,
+                                          dynamicLightColor.z, 50.0f};
+        framelights.push_back(hardcodedSun);
+
+        int lightCount = static_cast<int>(framelights.size());
+        MTL::Buffer *lightBuffer = nullptr;
+
+        if (lightCount > 0) {
+          lightBuffer =
+            metalDevice->newBuffer(framelights.data(), sizeof(LightData) * lightCount,
+                                 MTL::ResourceStorageModeShared);
+        } else {
+          // 防崩溃：即使没有光源，也要创建一个正好等于 1 个 LightData 大小的假
+          // Buffer，满足 Metal 的空间检查
+          LightData dummyLight = {}; // 默认初始化为0
+          lightBuffer = metalDevice->newBuffer(&dummyLight, sizeof(LightData),
+                                           MTL::ResourceStorageModeShared);
+        }
+        uniformBuffers.push_back(lightBuffer);
+
+        
         { // forward pass Render
             renderCommandEncoder = commandBuffer->renderCommandEncoder(forwardPassDescriptor);
             renderCommandEncoder->setRenderPipelineState(renderPSO);
@@ -597,6 +674,9 @@ int main(int argc, const char * argv[]) {
                     
                     renderCommandEncoder->setVertexBuffer(thisUniform, 0, 1);
                     renderCommandEncoder->setFragmentBuffer(thisUniform, 0, 1);
+                    renderCommandEncoder->setFragmentBuffer(lightBuffer, 0, 2);
+                    renderCommandEncoder->setFragmentBytes(&lightCount, sizeof(int), 3);
+                    
                     
                     auto& material = model.getMaterial(sub.materialIndex);
                     renderCommandEncoder->setFragmentTexture(material.albedoTexture, 0);
@@ -607,7 +687,7 @@ int main(int argc, const char * argv[]) {
                     renderCommandEncoder->setFragmentTexture(material.alphaTexture, 5);
                     renderCommandEncoder->setFragmentTexture(material.emissiveTexture, 6);
                     renderCommandEncoder->setFragmentTexture(skyboxTexture, 7);
-                    renderCommandEncoder->setFragmentBytes(&exposure, sizeof(float), 0);
+                    renderCommandEncoder->setFragmentBytes(&physicalParams, sizeof(CameraPostParams), 0);
                     renderCommandEncoder->setFragmentTexture(irradianceMap, 8);
                     renderCommandEncoder->setFragmentTexture(prefilterMap, 9);
                     renderCommandEncoder->setFragmentTexture(brdfLUT, 10);
@@ -681,7 +761,7 @@ int main(int argc, const char * argv[]) {
             /// post merge
             renderCommandEncoder = commandBuffer->renderCommandEncoder(postMergePassDescriptor);
             renderCommandEncoder->setRenderPipelineState(postMergePipelineState);
-            renderCommandEncoder->setFragmentBytes(&exposure, sizeof(float), 0);
+            renderCommandEncoder->setFragmentBytes(&physicalParams, sizeof(CameraPostParams), 0);
             renderCommandEncoder->setFragmentTexture(rawColorTexture, 0);
             renderCommandEncoder->setFragmentTexture(bloomBlurMap, 1);
             renderCommandEncoder->drawPrimitives(MTL::PrimitiveTypeTriangle, NS::UInteger(0), NS::UInteger(6));

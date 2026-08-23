@@ -293,7 +293,7 @@ void Renderer::render(CA::MetalDrawable *drawable) {
       forwardEncoder->setFragmentBuffer(thisUniform, 0, 1);
       forwardEncoder->setFragmentBuffer(lightBuffer, 0, 2);
       forwardEncoder->setFragmentBytes(&lightCount, sizeof(int), 3);
-
+                    
       auto &material = model.getMaterial(sub.materialIndex);
       forwardEncoder->setFragmentTexture(material.albedoTexture, 0);
       forwardEncoder->setFragmentTexture(material.normalTexture, 1);
