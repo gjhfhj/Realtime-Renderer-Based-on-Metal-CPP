@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Scheme
-   LastUpgradeVersion = "2640"
+   LastUpgradeVersion = "2700"
    version = "1.7">
    <BuildAction
       parallelizeBuildables = "YES"
@@ -15,9 +15,8 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "BC7F58512F80579200CB96D1"
-               BuildableName = "RealtimeRendererApp.app"
-               BlueprintName = "RealtimeRendererApp"
+               BlueprintIdentifier = "BC85FF652F190E82005A2E31"
+               BuildableName = "Realtime Renderer Based on Metal-CPP"
                ReferencedContainer = "container:Realtime Renderer Based on Metal-CPP.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -39,16 +38,15 @@
       ignoresPersistentStateOnLaunch = "NO"
       debugDocumentVersioning = "YES"
       debugServiceExtension = "internal"
-      enableGPUFrameCaptureMode = "1"
       allowLocationSimulation = "YES"
-      queueDebuggingEnableBacktraceRecording = "Yes">
+      viewDebuggingEnabled = "No"
+      queueDebuggingEnabled = "No">
       <BuildableProductRunnable
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "BC7F58512F80579200CB96D1"
-            BuildableName = "RealtimeRendererApp.app"
-            BlueprintName = "RealtimeRendererApp"
+            BlueprintIdentifier = "BC85FF652F190E82005A2E31"
+            BuildableName = "Realtime Renderer Based on Metal-CPP"
             ReferencedContainer = "container:Realtime Renderer Based on Metal-CPP.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
@@ -63,9 +61,8 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "BC7F58512F80579200CB96D1"
-            BuildableName = "RealtimeRendererApp.app"
-            BlueprintName = "RealtimeRendererApp"
+            BlueprintIdentifier = "BC85FF652F190E82005A2E31"
+            BuildableName = "Realtime Renderer Based on Metal-CPP"
             ReferencedContainer = "container:Realtime Renderer Based on Metal-CPP.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
