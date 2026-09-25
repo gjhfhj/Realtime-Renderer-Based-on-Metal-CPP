@@ -11,6 +11,7 @@
 		BC4D7EB42F80602200A7EA10 /* libassimp.5.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = BC79C95B2F1D7D5E0069AD69 /* libassimp.5.dylib */; };
 		BC4D7EB52F80602400A7EA10 /* libassimp.5.4.3.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = BC79C95C2F1D7D5E0069AD69 /* libassimp.5.4.3.dylib */; };
 		BC4D7EB72F80607200A7EA10 /* libassimp.5.dylib in Embed Libraries */ = {isa = PBXBuildFile; fileRef = BC79C95B2F1D7D5E0069AD69 /* libassimp.5.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
+		BC50440D306664D9000C10A6 /* DEVELOPMENT.md in Resources */ = {isa = PBXBuildFile; fileRef = BC50440C306664D9000C10A6 /* DEVELOPMENT.md */; };
 		BC5FF43E2FAE2106001E3B56 /* assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = BC5FF43D2FAE2106001E3B56 /* assets.xcassets */; };
 		BC79C9622F1D7D5E0069AD69 /* libassimp.5.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = BC79C95B2F1D7D5E0069AD69 /* libassimp.5.dylib */; };
 		BC79C9632F1D7D5E0069AD69 /* libassimp.5.4.3.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = BC79C95C2F1D7D5E0069AD69 /* libassimp.5.4.3.dylib */; };
@@ -254,6 +255,7 @@
 		BC1B50642F6DD6CE000C434E /* Television_01_nor_gl_4k.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = Television_01_nor_gl_4k.jpg; sourceTree = "<group>"; };
 		BC1B50662F6DD6CE000C434E /* Television_01.bin */ = {isa = PBXFileReference; lastKnownFileType = archive.macbinary; path = Television_01.bin; sourceTree = "<group>"; };
 		BC1B50672F6DD6CE000C434E /* Television_01_4k.gltf */ = {isa = PBXFileReference; lastKnownFileType = text; path = Television_01_4k.gltf; sourceTree = "<group>"; };
+		BC50440C306664D9000C10A6 /* DEVELOPMENT.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = DEVELOPMENT.md; sourceTree = "<group>"; };
 		BC5FF43D2FAE2106001E3B56 /* assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = assets.xcassets; sourceTree = "<group>"; };
 		BC79C8F82F1D7D5E0069AD69 /* poppack1.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = poppack1.h; sourceTree = "<group>"; };
 		BC79C8F92F1D7D5E0069AD69 /* pstdint.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = pstdint.h; sourceTree = "<group>"; };
@@ -1255,6 +1257,7 @@
 				BC85FF682F190E82005A2E31 /* Realtime Renderer Based on Metal-CPP */,
 				BC7F58532F80579200CB96D1 /* swift_Bridge */,
 				BC85000D2F1934F9005A2E31 /* Frameworks */,
+				BC50440C306664D9000C10A6 /* DEVELOPMENT.md */,
 				BC85FF672F190E82005A2E31 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -1520,6 +1523,7 @@
 				BCC82C9C2F8C98BD005450B4 /* tree004.bin in Resources */,
 				BC5FF43E2FAE2106001E3B56 /* assets.xcassets in Resources */,
 				BCC82C9D2F8C98BD005450B4 /* Leaf_02_DIFF.png in Resources */,
+				BC50440D306664D9000C10A6 /* DEVELOPMENT.md in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
