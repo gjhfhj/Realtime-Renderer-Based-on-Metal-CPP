@@ -97,6 +97,7 @@ public:
     
     // 深拷贝 应对scene.addModel, 否则other里头的指针成了野指针
     Model(const Model& other);
+    Model& operator=(const Model&) = delete; //2026 0927 18:57 暂时拒绝赋值拷贝，目前scene.addModel拷贝构造就行了
     static MTL::VertexDescriptor* createVertexDescriptor();
 
     simd::float4x4 setModelMatrix(const simd::float3 &pos,const simd::float3 &rotate,const simd::float3 &s) const;

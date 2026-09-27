@@ -596,41 +596,27 @@ Model::Model(const Model& other) {
     modelDir    = other.modelDir;
     submeshes   = other.submeshes;
     indexCount  = other.indexCount;
-    materials   = other.materials;
+    materials   = other.materials; // 浅拷贝 scalars 和 strings
     modelMatrix = other.modelMatrix;
     lights      = other.lights;
 
-    materials.reserve(other.materials.size());
-    for (const auto& otherMat : other.materials) {
-        PBRMaterial mat = otherMat;  // 拷贝 scalars 和 strings
-        // retain 纹理指针（如果已加载）
-        if (otherMat.albedoTexture) mat.albedoTexture = otherMat.albedoTexture->retain();
-        if (otherMat.normalTexture) mat.normalTexture = otherMat.normalTexture->retain();
-        if (otherMat.metallicTexture) mat.metallicTexture = otherMat.metallicTexture->retain();
-        if (otherMat.roughnessTexture) mat.roughnessTexture = otherMat.roughnessTexture->retain();
-        if (otherMat.aoTexture) mat.aoTexture = otherMat.aoTexture->retain();
-        if (otherMat.alphaTexture) mat.alphaTexture = otherMat.alphaTexture->retain();
-        if (otherMat.emissiveTexture) mat.emissiveTexture = otherMat.emissiveTexture->retain();
-        materials.push_back(mat);
+    for (auto& mat : materials) {
+        //retain()让texture引用+1，引用为0时才会清除数据。
+        if (mat.albedoTexture)   mat.albedoTexture->retain();
+        if (mat.normalTexture)   mat.normalTexture->retain();
+        if (mat.metallicTexture) mat.metallicTexture->retain();
+        if (mat.roughnessTexture) mat.roughnessTexture->retain();
+        if (mat.aoTexture)       mat.aoTexture->retain();
+        if (mat.alphaTexture)    mat.alphaTexture->retain();
+        if (mat.emissiveTexture) mat.emissiveTexture->retain();
     }
     
     if (other.vertexBuffer && other.indexBuffer) {
-        auto* device = MTL::CreateSystemDefaultDevice();
-        
-        // 深拷贝 buffer
-        vertexBuffer = device->newBuffer(
-            other.vertexBuffer->contents(),
-            other.vertexBuffer->length(),
-            MTL::ResourceStorageModeShared
-        );
-        
-        indexBuffer = device->newBuffer(
-            other.indexBuffer->contents(),
-            other.indexBuffer->length(),
-            MTL::ResourceStorageModeShared
-        );
-        
-        device->release();
+        //不需要深拷贝重新复制一份数据，直接retain引用+1
+        //若以后需要对instance独立修改模型数据，则需要深拷贝复制一份
+        vertexBuffer = other.vertexBuffer ? other.vertexBuffer->retain() : nullptr;
+
+        indexBuffer = other.indexBuffer ? other.indexBuffer->retain() : nullptr;
     }
 }
 
